@@ -9,6 +9,9 @@ CONTROLLER_MANAGER_IMG="docker.io/ansibleplaybookbundle/controller-manager:lates
 TARGET_PROJECT=foo
 ASB_BRANCH=master
 
+sudo yum -y install etcd nmap telnet jq wget
+sudo /sbin/service etcd start
+
 oc cluster up --routing-suffix=$ROUTING_SUFFIX
 
 # Launch oc cluster up create user with cluster root
@@ -29,8 +32,8 @@ else
   echo "============================================================"
   docker pull $APISERVER_IMG
   docker pull $CONTROLLER_MANAGER_IMG
-  docker tag $APISERVER_IMG apiserver:canary
-  docker tag $CONTROLLER_MANAGER_IMG controller-manager:canary
+  docker tag $APISERVER_IMG apiserver:0.0.2
+  docker tag $CONTROLLER_MANAGER_IMG controller-manager:0.0.2-hack
 fi
 
 # Deploy service-catalog
@@ -49,27 +52,34 @@ cat /shared/kubeconfig.templ.yaml | sed "s|{{SERVICE_CATALOG_ENDPOINT}}|$SERVICE
   > /home/vagrant/.kube/service-catalog.config
 chown -R vagrant:vagrant /home/vagrant/.kube
 
-# Bring up broker
+## Bring up broker
+sudo yum -y install python-requests
 mkdir -p $GOPATH/src/github.com/fusor
 cd $GOPATH/src/github.com/fusor
 git clone https://github.com/fusor/ansible-service-broker.git
-pushd ansible-service-broker && git checkout $ASB_BRANCH && popd
-cd ansible-service-broker/scripts/asbcli
-pip install -r ./requirements.txt
-./asbcli up $CLUSTER_IP:8443 \
-  --cluster-user=admin --cluster-pass=admin \
-  --dockerhub-user=$DOCKERHUB_USER --dockerhub-pass=$DOCKERHUB_PASS
-
-oc project ansible-service-broker
-until oc get pods | grep -iEm1 "asb.*?running" | grep -v deploy; do : ; done
-until oc get pods | grep -iEm1 "etcd.*?running" | grep -v deploy; do : ; done
-sleep 20
-
-ASB_ROUTE=$(oc get routes | grep ansible-service-broker | awk '{print $2}')
+#pushd ansible-service-broker && git checkout $ASB_BRANCH && popd
+#cd ansible-service-broker/scripts/asbcli
+#pip install -r ./requirements.txt
+#./asbcli up $CLUSTER_IP:8443 \
+#  --cluster-user=admin --cluster-pass=admin \
+#  --dockerhub-user=$DOCKERHUB_USER --dockerhub-pass=$DOCKERHUB_PASS
+#
+#oc project ansible-service-broker
+#until oc get pods | grep -iEm1 "asb.*?running" | grep -v deploy; do : ; done
+#until oc get pods | grep -iEm1 "etcd.*?running" | grep -v deploy; do : ; done
+#sleep 20
+#
+#ASB_ROUTE=$(oc get routes | grep ansible-service-broker | awk '{print $2}')
+sudo mkdir -p /etc/ansible-service-broker
+sudo cp /broker/extras/mock-registry-data.yaml /etc/ansible-service-broker/mock-registry-data.yaml
+sudo chmod 644 /etc/ansible-service-broker/mock-registry-data.yaml
+#/broker/bin/broker  --config=/broker/etc/prod.config.yaml --scripts /broker/scripts >  /tmp/stdout-asb.log &
+/broker/bin/broker  --config=/broker/etc/mock.config.yaml --scripts /broker/scripts >  /tmp/stdout-asb.log &
+ASB_ROUTE="192.168.67.2:1338"
 echo "export ASB_ROUTE=$ASB_ROUTE" >> /etc/profile
 echo "Ansible Service Broker Route: $ASB_ROUTE"
 echo "Bootstrapping broker..."
-curl -X POST $ASB_ROUTE/v2/bootstrap
+curl -X POST http://$ASB_ROUTE/v2/bootstrap
 echo "Successfully bootstrapped broker!"
 
 # Resource defs
@@ -99,5 +109,6 @@ echo "Successfully setup oc completion!"
 echo "============================================================"
 
 # Setup alias to use service-catalog apiserver with kubectl
-cp /shared/catctl.profile.sh /etc/profile.d
-echo "source <(oc completion bash)" > /home/vagrant/.bash_profile
+sudo cp /shared/catctl.profile.sh /etc/profile.d
+cp /home/vagrant/.bash_profile /home/vagrant/bash_profile_bak
+echo "source <(oc completion bash)" >> /home/vagrant/.bash_profile
