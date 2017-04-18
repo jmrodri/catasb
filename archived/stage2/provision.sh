@@ -2,8 +2,9 @@ CLUSTER_IP=$1
 ROUTING_SUFFIX=$CLUSTER_IP.nip.io
 CLUSTER_USER=admin
 KUBE_INCUBATOR_DIR=$GOPATH/src/github.com/kubernetes-incubator
-SERVICE_CAT_REPO=https://www.github.com/kubernetes-incubator/service-catalog.git
+SERVICE_CAT_REPO=https://www.github.com/jmrodri/service-catalog.git
 SERVICE_CAT_DIR=$KUBE_INCUBATOR_DIR/service-catalog
+SERVICE_CAT_BRANCH=increase-polling
 APISERVER_IMG="quay.io/kubernetes-service-catalog/apiserver:canary"
 CONTROLLER_MANAGER_IMG="quay.io/kubernetes-service-catalog/controller-manager:canary"
 TARGET_PROJECT=foo
@@ -21,6 +22,7 @@ if [[ -n "$BUILD_CATALOG" ]]; then
   echo "============================================================"
   mkdir -p $KUBE_INCUBATOR_DIR
   git clone $SERVICE_CAT_REPO $SERVICE_CAT_DIR
+  git checkout $SERVICE_CAT_BRANCH
   cd $SERVICE_CAT_DIR
   NO_DOCKER=1 make apiserver-image controller-manager-image
 else
