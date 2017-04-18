@@ -78,10 +78,10 @@ sudo chmod 644 /etc/ansible-service-broker/mock-registry-data.yaml
 #/broker/bin/broker  --config=/broker/etc/prod.config.yaml --scripts /broker/scripts >  /tmp/stdout-asb.log &
 /broker/bin/broker  --config=/broker/etc/mock.config.yaml --scripts /broker/scripts >  /tmp/stdout-asb.log &
 ASB_ROUTE="192.168.67.2:1338"
-sudo echo "export ASB_ROUTE=$ASB_ROUTE" >> /etc/profile
+sudo sh -c 'echo "export ASB_ROUTE=$ASB_ROUTE" >> /etc/profile'
 echo "Ansible Service Broker Route: $ASB_ROUTE"
 echo "Bootstrapping broker..."
-curl -X POST http://localhost:1338/v2/bootstrap
+curl -s -X POST http://localhost:1338/v2/bootstrap
 echo "Successfully bootstrapped broker!"
 
 # Resource defs
