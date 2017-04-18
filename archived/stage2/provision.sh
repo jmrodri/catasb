@@ -9,6 +9,7 @@ APISERVER_IMG="quay.io/kubernetes-service-catalog/apiserver:canary"
 CONTROLLER_MANAGER_IMG="quay.io/kubernetes-service-catalog/controller-manager:canary"
 TARGET_PROJECT=foo
 ASB_BRANCH=forced-async-prov
+BUILD_CATALOG=1
 
 oc cluster up --routing-suffix=$ROUTING_SUFFIX
 
@@ -22,8 +23,8 @@ if [[ -n "$BUILD_CATALOG" ]]; then
   echo "============================================================"
   mkdir -p $KUBE_INCUBATOR_DIR
   git clone $SERVICE_CAT_REPO $SERVICE_CAT_DIR
-  git checkout $SERVICE_CAT_BRANCH
   cd $SERVICE_CAT_DIR
+  git checkout $SERVICE_CAT_BRANCH
   NO_DOCKER=1 make apiserver-image controller-manager-image
 else
   echo "============================================================"
