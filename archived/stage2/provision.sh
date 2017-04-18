@@ -2,12 +2,13 @@ CLUSTER_IP=$1
 ROUTING_SUFFIX=$CLUSTER_IP.nip.io
 CLUSTER_USER=admin
 KUBE_INCUBATOR_DIR=$GOPATH/src/github.com/kubernetes-incubator
-SERVICE_CAT_REPO=https://www.github.com/kubernetes-incubator/service-catalog.git
+SERVICE_CAT_REPO=https://www.github.com/jmrodri/service-catalog.git
 SERVICE_CAT_DIR=$KUBE_INCUBATOR_DIR/service-catalog
 APISERVER_IMG="docker.io/ansibleplaybookbundle/apiserver:latest"
 CONTROLLER_MANAGER_IMG="docker.io/ansibleplaybookbundle/controller-manager:latest"
 TARGET_PROJECT=foo
 ASB_BRANCH=master
+BUILD_CATALOG=1
 
 sudo yum -y install etcd nmap telnet jq wget
 sudo /sbin/service etcd start
@@ -25,6 +26,7 @@ if [[ -n "$BUILD_CATALOG" ]]; then
   mkdir -p $KUBE_INCUBATOR_DIR
   git clone $SERVICE_CAT_REPO $SERVICE_CAT_DIR
   cd $SERVICE_CAT_DIR
+  git checkout $SERVICE_CAT_BRANCH
   NO_DOCKER=1 make apiserver-image controller-manager-image
 else
   echo "============================================================"
@@ -76,10 +78,10 @@ sudo chmod 644 /etc/ansible-service-broker/mock-registry-data.yaml
 #/broker/bin/broker  --config=/broker/etc/prod.config.yaml --scripts /broker/scripts >  /tmp/stdout-asb.log &
 /broker/bin/broker  --config=/broker/etc/mock.config.yaml --scripts /broker/scripts >  /tmp/stdout-asb.log &
 ASB_ROUTE="192.168.67.2:1338"
-echo "export ASB_ROUTE=$ASB_ROUTE" >> /etc/profile
+sudo echo "export ASB_ROUTE=$ASB_ROUTE" >> /etc/profile
 echo "Ansible Service Broker Route: $ASB_ROUTE"
 echo "Bootstrapping broker..."
-curl -X POST http://$ASB_ROUTE/v2/bootstrap
+curl -X POST http://localhost:1338/v2/bootstrap
 echo "Successfully bootstrapped broker!"
 
 # Resource defs
