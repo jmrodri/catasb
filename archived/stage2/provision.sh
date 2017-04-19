@@ -4,10 +4,10 @@ CLUSTER_USER=admin
 KUBE_INCUBATOR_DIR=$GOPATH/src/github.com/kubernetes-incubator
 SERVICE_CAT_REPO=https://www.github.com/kubernetes-incubator/service-catalog.git
 SERVICE_CAT_DIR=$KUBE_INCUBATOR_DIR/service-catalog
-APISERVER_IMG="quay.io/kubernetes-service-catalog/apiserver:canary"
-CONTROLLER_MANAGER_IMG="docker.io/pmorie/controller-manager:0.0.2-hack"
+APISERVER_IMG="docker.io/jmrodri/apiserver:zeus"
+CONTROLLER_MANAGER_IMG="docker.io/jmrodri/controller-manager:zeus"
 TARGET_PROJECT=foo
-ASB_BRANCH=forced-async-prov
+ASB_BRANCH=work-engine
 
 oc cluster up --routing-suffix=$ROUTING_SUFFIX
 

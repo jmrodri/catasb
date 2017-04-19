@@ -17,7 +17,7 @@
     git:
       repo: https://github.com/fusor/ansible-service-broker.git
       dest: "{{ go_path }}/src/github.com/fusor/ansible-service-broker"
-      version: "forced-async-prov"
+      version: "work-engine"
     register: git_clone_asb
 
   - name: Install asbcli requirements
@@ -25,9 +25,9 @@
       requirements: "{{ go_path }}/src/github.com/fusor/ansible-service-broker/scripts/asbcli/requirements.txt"
     when: git_clone_asb.changed
 
-  - name: Docker pull ansibleplaybookbundle/ansible-service-broker-apb:latest
+  - name: Docker pull jmrodri/ansible-service-broker-apb:latest
     docker_image:
-      name: ansibleplaybookbundle/ansible-service-broker-apb:latest
+      name: jmrodri/ansible-service-broker-apb:latest
 
   - name: Check if ansible-service-broker project already exists from a prior run
     shell: "{{ oc_cmd }} get projects | grep ansible-service-broker"
