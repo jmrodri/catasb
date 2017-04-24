@@ -4,8 +4,8 @@ CLUSTER_USER=admin
 KUBE_INCUBATOR_DIR=$GOPATH/src/github.com/kubernetes-incubator
 SERVICE_CAT_REPO=https://www.github.com/kubernetes-incubator/service-catalog.git
 SERVICE_CAT_DIR=$KUBE_INCUBATOR_DIR/service-catalog
-APISERVER_IMG="docker.io/jmrodri/apiserver:zeus"
-CONTROLLER_MANAGER_IMG="docker.io/jmrodri/controller-manager:zeus"
+APISERVER_IMG="docker.io/jmrodri/apiserver:0.0.3-summit-patch"
+CONTROLLER_MANAGER_IMG="docker.io/jmrodri/controller-manager:0.0.3-summit-patch"
 TARGET_PROJECT=foo
 ASB_BRANCH=work-engine
 
