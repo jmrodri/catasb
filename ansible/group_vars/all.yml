@@ -91,8 +91,10 @@ oc_cmd: "{{ oc_client_install_path }}/oc"
 oadm_cmd: "{{ oc_client_install_path }}/oadm"
 kubectl_cmd: "{{ oc_client_install_path }}/kubectl"
 
-origin_image_name: docker.io/openshift/origin
-origin_image_tag: latest
+#origin_image_name: docker.io/openshift/origin
+origin_image_name: registry-proxy.engineering.redhat.com/rh-osbs/openshift3-ose
+#origin_image_tag: latest
+origin_image_tag: v3.11.188-2
 oc_cluster_up_retries: 0
 oc_cluster_up_base_dir: /tmp/openshift.local.clusterup
 oc_host_config_dir: "{{ oc_cluster_up_base_dir }}"
@@ -222,15 +224,16 @@ asb_scheme: https
 deploy_olm: false
 
 # These docker images we want to remove and fetch on each setup
+    #- { img: "{{ origin_image_name }}-service-catalog", tag: "{{ origin_image_tag }}" }
 docker_images_group1:
   - { img: "{{ broker_image_name }}", tag: "{{ broker_tag }}" }
-  - { img: "{{ origin_image_name }}-service-catalog", tag: "{{ origin_image_tag }}" }
+  - { img: "registry-proxy.engineering.redhat.com/rh-osbs/openshift3-ose-service-catalog", tag: "v3.11.188-2" }
   - { img: "{{ awsservicebroker_broker_image_name }}", tag: "{{ awsservicebroker_broker_tag }}" }
 
 # These docker images change less frequently, we are OK pulling them once and reusing
 docker_images_group2:
   - { img: "{{ etcd_image_name }}", tag: "{{ etcd_tag }}" }
-  - { img: "{{ origin_image_name }}", tag: "{{ origin_image_tag }}" }
+    #- { img: "{{ origin_image_name }}", tag: "{{ origin_image_tag }}" }
   - { img: "{{ origin_image_name }}-deployer", tag: "{{ origin_image_tag }}" }
   - { img: "{{ origin_image_name }}-docker-registry", tag: "{{ origin_image_tag }}" }
   - { img: "{{ origin_image_name }}-haproxy-router", tag: "{{ origin_image_tag }}" }

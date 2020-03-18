@@ -51,7 +51,8 @@
   - set_fact:
       major: "{{ kubectl_stable_version.content.split('.')[0] }}"
       minor: "{{ origin_image_tag.split('.')[1] }}"
-      revision: "{{ origin_image_tag.split('.')[2] | default('0') }}"
+      #revision: "{{ origin_image_tag.split('.')[2] | default('0') }}"
+      revision: "0"
     when: not("latest" in origin_image_tag)
 
   - set_fact:
@@ -59,7 +60,7 @@
       kube_ctl_url: "https://storage.googleapis.com/kubernetes-release/release/{{ major }}.{{ minor }}.{{ revision }}/bin/{{ kube_build_type }}/amd64/kubectl"
 
   - package:
-      name: "libselinux-python"
+      name: "python3-libselinux"
       state: installed
     become: true
     when: ansible_os_family == "RedHat"
@@ -178,7 +179,7 @@
 
   - name: Install docker through yum as it's a requirement of ansible docker module
     package:
-      name: python2-docker
+      name: python3-docker
       state: installed
     become: 'true'
     when: ansible_os_family == "RedHat"
@@ -301,7 +302,7 @@
         --public-hostname={{ hostname }}
         --base-dir={{ oc_cluster_up_base_dir }}
         --tag={{ origin_image_tag }}
-        --image={{ origin_image_name }}-\${component}:\${version}
+        --image={{ origin_image_name }}-\${component}:v3.11.188-2
         --enable=service-catalog,router,registry,web-console,persistent-volumes,sample-templates,rhel-imagestreams{{ ",automation-service-broker" if enable_ansible_broker else "" }}{{ ",template-service-broker" if enable_template_broker else "" }}
     when: ("v3.10" in origin_image_tag) or
           ("v3.11" in origin_image_tag)
@@ -314,7 +315,7 @@
         --public-hostname={{ hostname }}
         --base-dir={{ oc_cluster_up_base_dir }}
         --tag={{ origin_image_tag }}
-        --image={{ origin_image_name }}-\${component}:\${version}
+        --image={{ origin_image_name }}-\${component}:v3.11.188-2
     when: ("v4.0" in origin_image_tag) or
           ("latest" in origin_image_tag)
 
